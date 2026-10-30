@@ -802,8 +802,12 @@ next_info:
 		 * Scan results are returned as JavaScript and evaluated by the GUI.
 		 * Escape the complete SSID instead of trying to special-case a single
 		 * quote; SSIDs may contain quotes, backslashes and control characters.
+		 * Decode UTF-8 so non-ASCII SSIDs are not escaped byte by byte, and
+		 * fall back to js_string() when the SSID is not valid UTF-8.
 		 */
-		ssid_js = js_string(apinfos[i].SSID);
+		ssid_js = utf8_to_js_string(apinfos[i].SSID);
+		if (!ssid_js)
+			ssid_js = js_string(apinfos[i].SSID);
 
 		/* note: provide/use control channel and not the actual channel because we use it for wireless survey and scan button at basic-network.asp */
 		web_printf("%c['%s','%s',%d,%d,%d,%d,", rp->comma,
